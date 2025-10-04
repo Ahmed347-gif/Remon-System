@@ -56,6 +56,15 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+app.get('/clients', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'clients.html'));
+});
+
+app.get('/cases', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'cases.html'));
+});
+
+
 // Connect to MongoDB
 mongoose.connect("mongodb+srv://MegoDB:xgKwWUL1clsSECso@cluster0.rchlmdg.mongodb.net/app-data-remon?retryWrites=true&w=majority&appName=Cluster0", {
   useNewUrlParser: true,
@@ -77,3 +86,4 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
