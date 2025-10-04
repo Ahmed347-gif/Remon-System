@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة القضايا - نظام إدارة قضايا المحاماة</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>إدارة القضايا</h1>
+            <nav>
+                <a href="index.html" class="btn btn-secondary">← العودة للوحة التحكم</a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Add Case Form -->
+            <section class="form-section">
+                <h2 id="form-title">إضافة قضية جديدة</h2>
+                <form id="case-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="caseNumber">رقم القضية *</label>
+                            <input type="text" id="caseNumber" name="caseNumber" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="title">عنوان القضية *</label>
+                            <input type="text" id="title" name="title" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="court">المحكمة *</label>
+                            <input type="text" id="court" name="court" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="type">نوع القضية *</label>
+                            <input type="text" id="type" name="type" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="clientId">العميل *</label>
+                            <select id="clientId" name="clientId" required>
+                                <option value="">اختر عميل</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="status">الحالة *</label>
+                            <select id="status" name="status" required>
+                                <option value="open">مفتوحة</option>
+                                <option value="closed">مغلقة</option>
+                                <option value="adjourned">مؤجلة</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="startDate">تاريخ البداية *</label>
+                        <input type="date" id="startDate" name="startDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">ملاحظات</label>
+                        <textarea id="notes" name="notes" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="submit-btn">إضافة قضية</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-btn" style="display: none;">إلغاء</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Search Section -->
+            <section class="search-section">
+                <h2>البحث في القضايا</h2>
+                <div class="search-form">
+                    <div class="form-group">
+                        <label for="search-client-phone">رقم هاتف العميل</label>
+                        <input type="text" id="search-client-phone" placeholder="أدخل رقم هاتف العميل للبحث">
+                    </div>
+                    <button type="button" class="btn btn-primary" id="search-btn">بحث</button>
+                    <button type="button" class="btn btn-secondary" id="clear-search-btn">مسح البحث</button>
+                </div>
+            </section>
+
+            <!-- Cases List -->
+            <section class="list-section">
+                <h2>قائمة القضايا</h2>
+                <div id="cases-list">
+                    <div class="loading">جاري تحميل القضايا...</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Message Display -->
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="cases.js"></script>
+</body>
+</html>

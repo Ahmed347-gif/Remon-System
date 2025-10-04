@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة قضايا المحاماة</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-gavel"></i> نظام إدارة قضايا المحاماة</h1>
+            <p>إدارة عملائك وقضاياك بكفاءة عالية</p>
+        </header>
+
+        <!-- Statistics Cards -->
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalClients">0</h3>
+                        <p>إجمالي العملاء</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalCases">0</h3>
+                        <p>إجمالي القضايا</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="openCases">0</h3>
+                        <p>قضايا مفتوحة</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="closedCases">0</h3>
+                        <p>قضايا منتهية</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Search -->
+        <div class="search-section">
+            <h2><i class="fas fa-search"></i> البحث السريع</h2>
+            <div class="quick-search">
+                <input type="text" id="quickSearch" placeholder="ابحث عن عميل أو قضية...">
+                <button onclick="performQuickSearch()" class="btn btn-primary">
+                    <i class="fas fa-search"></i> بحث
+                </button>
+            </div>
+            <div id="searchResults" class="search-results"></div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <main class="dashboard">
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h2>العملاء</h2>
+                    <p>إدارة معلومات عملائك</p>
+                    <a href="clients.html" class="btn btn-primary">إدارة العملاء</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h2>القضايا</h2>
+                    <p>تتبع وإدارة القضايا القانونية</p>
+                    <a href="cases.html" class="btn btn-primary">إدارة القضايا</a>
+                </div>
+            </div>
+        </main>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity">
+            <h2><i class="fas fa-history"></i> النشاطات الأخيرة</h2>
+            <div id="recentCases" class="activity-list">
+                <div class="loading">جاري تحميل البيانات...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load statistics on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatistics();
+            loadRecentCases();
+        });
+
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+                
+                document.getElementById('totalClients').textContent = stats.totalClients;
+                document.getElementById('totalCases').textContent = stats.totalCases;
+                document.getElementById('openCases').textContent = stats.openCases;
+                document.getElementById('closedCases').textContent = stats.closedCases;
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        async function loadRecentCases() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+                
+                const recentCasesContainer = document.getElementById('recentCases');
+                
+                if (stats.recentCases.length === 0) {
+                    recentCasesContainer.innerHTML = '<div class="empty-state"><h3>لا توجد قضايا حديثة</h3></div>';
+                    return;
+                }
+                
+                recentCasesContainer.innerHTML = stats.recentCases.map(case_ => `
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-folder"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>${case_.title}</h4>
+                            <p>رقم القضية: ${case_.caseNumber}</p>
+                            <p>العميل: ${case_.clientId.name}</p>
+                            <span class="status ${case_.status}">${getStatusText(case_.status)}</span>
+                        </div>
+                        <div class="activity-date">
+                            ${new Date(case_.createdAt).toLocaleDateString('ar-SA')}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading recent cases:', error);
+                document.getElementById('recentCases').innerHTML = '<div class="empty-state"><h3>خطأ في تحميل البيانات</h3></div>';
+            }
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'open': 'مفتوحة',
+                'closed': 'منتهية',
+                'adjourned': 'مؤجلة'
+            };
+            return statusMap[status] || status;
+        }
+
+        async function performQuickSearch() {
+            const searchTerm = document.getElementById('quickSearch').value.trim();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (!searchTerm) {
+                resultsContainer.innerHTML = '';
+                return;
+            }
+            
+            try {
+                // Search clients
+                const clientsResponse = await fetch(`/api/clients?search=${encodeURIComponent(searchTerm)}`);
+                const clients = await clientsResponse.json();
+                
+                // Search cases
+                const casesResponse = await fetch(`/api/cases?search=${encodeURIComponent(searchTerm)}`);
+                const cases = await casesResponse.json();
+                
+                let resultsHTML = '';
+                
+                if (clients.length > 0) {
+                    resultsHTML += '<h4>العملاء:</h4>';
+                    resultsHTML += clients.map(client => `
+                        <div class="search-result-item">
+                            <i class="fas fa-user"></i>
+                            <span>${client.name} - ${client.phone}</span>
+                            <a href="clients.html" class="btn btn-sm btn-primary">عرض</a>
+                        </div>
+                    `).join('');
+                }
+                
+                if (cases.length > 0) {
+                    resultsHTML += '<h4>القضايا:</h4>';
+                    resultsHTML += cases.map(case_ => `
+                        <div class="search-result-item">
+                            <i class="fas fa-folder"></i>
+                            <span>${case_.title} - ${case_.caseNumber}</span>
+                            <a href="cases.html" class="btn btn-sm btn-primary">عرض</a>
+                        </div>
+                    `).join('');
+                }
+                
+                if (resultsHTML === '') {
+                    resultsHTML = '<div class="empty-state"><p>لا توجد نتائج</p></div>';
+                }
+                
+                resultsContainer.innerHTML = resultsHTML;
+            } catch (error) {
+                console.error('Error performing search:', error);
+                resultsContainer.innerHTML = '<div class="empty-state"><p>خطأ في البحث</p></div>';
+            }
+        }
+
+        // Search on Enter key
+        document.getElementById('quickSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performQuickSearch();
+            }
+        });
+    </script>
+</body>
+</html>
